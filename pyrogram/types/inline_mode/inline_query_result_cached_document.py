@@ -19,6 +19,7 @@
 from typing import Optional
 
 from pyrogram import raw
+from pyrogram import utils
 from pyrogram import types
 from pyrogram.parser import Parser
 from .inline_query_result import InlineQueryResult
