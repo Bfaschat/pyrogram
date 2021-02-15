@@ -90,7 +90,7 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
 
     async def write(self):
         
-        document = utils.get_input_media_from_file_id(self.file_id, self.file_ref)
+        document = utils.get_input_file_from_file_id(self.file_id, self.file_ref)
 
         return raw.types.InputBotInlineResultDocument(
             id=self.id,
