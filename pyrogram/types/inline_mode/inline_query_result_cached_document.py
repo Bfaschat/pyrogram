@@ -60,11 +60,11 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
 
     def __init__(
         self,
-        id: str = None,
         title: str,
-        file_url: str,
         file_id: str,
         file_ref: str = None,
+        id: str = None,
+        file_url:  str = None,
         description: str = None,
         caption: str = None,
         thumb_url: str = None,
@@ -80,12 +80,12 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
         self.file_id = file_id
         self.file_ref = file_ref
         self.title = title
+        self.file_url = file_url
         self.description = description
         self.caption = caption
         self.parse_mode = parse_mode
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
-        self.file_url = file_url
         self.thumb_url = thumb_url
         self.thumb_width = thumb_width
         self.thumb_height = thumb_height
