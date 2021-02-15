@@ -16,10 +16,9 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Union
+from typing import Optional
 
 from pyrogram import raw
-from pyrogram import utils
 from pyrogram import types
 from pyrogram.parser import Parser
 from .inline_query_result import InlineQueryResult
@@ -60,15 +59,20 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
 
     def __init__(
         self,
+        id: str = None,
         title: str,
+        file_url: str,
         file_id: str,
         file_ref: str = None,
-        id: str = None,
         description: str = None,
-        caption: str = "",
+        caption: str = None,
+        thumb_url: str = None,
+        thumb_width: int = None,
+        thumb_height: int = None,
         parse_mode: Union[str, None] = object,
         reply_markup: "types.InlineKeyboardMarkup" = None,
-        input_message_content: "types.InputMessageContent" = None
+        input_message_content: "types.InputMessageContent" = None,
+        **_kwargs: Any,
     ):
         super().__init__("file", id, input_message_content, reply_markup)
 
@@ -80,9 +84,14 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
         self.parse_mode = parse_mode
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
+        self.file_url = file_url
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height
 
     async def write(self):
-        document = utils.get_input_file_from_file_id(self.file_id, self.file_ref)
+        
+        document = utils.get_input_media_from_file_id(self.file_id, self.file_ref)
 
         return raw.types.InputBotInlineResultDocument(
             id=self.id,
