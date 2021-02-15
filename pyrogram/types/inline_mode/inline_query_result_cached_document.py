@@ -72,7 +72,6 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
         parse_mode: Union[str, None] = object,
         reply_markup: "types.InlineKeyboardMarkup" = None,
         input_message_content: "types.InputMessageContent" = None,
-        **_kwargs: Any,
     ):
         super().__init__("file", id, input_message_content, reply_markup)
 
