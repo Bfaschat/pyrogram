@@ -130,11 +130,11 @@ def get_input_media_from_file_id(
 
     raise ValueError(f"Unknown file id: {file_id}")
 
-def get_input_media_from_file_id(
+def get_input_file_from_file_id(
     file_id_str: str,
     file_ref: str = None,
     expected_media_type: int = None
-) -> Union["raw.types.InputMediaPhoto", "raw.types.InputMediaDocument"]:
+) -> Union["raw.types.InputPhoto", "raw.types.InputDocument"]:
     try:
         decoded = decode_file_id(file_id_str)
     except Exception:
@@ -154,29 +154,27 @@ def get_input_media_from_file_id(
 
         if media_type == 2:
             unpacked = struct.unpack("<iiqqqiiii", decoded)
-            dc_id, file_id, access_hash, volume_id, _, _, type, local_id = unpacked[1:]
+            file_id, access_hash = unpacked[2:4]
 
-            return raw.types.InputMediaPhoto(
-                id=raw.types.InputPhoto(
-                    id=file_id,
-                    access_hash=access_hash,
-                    file_reference=decode_file_ref(file_ref)
-                )
+            return raw.types.InputPhoto(
+                id=file_id,
+                access_hash=access_hash,
+                file_reference=decode_file_ref(file_ref)
             )
 
         if media_type in (3, 4, 5, 8, 9, 10, 13):
             unpacked = struct.unpack("<iiqq", decoded)
-            dc_id, file_id, access_hash = unpacked[1:]
+            file_id, access_hash = unpacked[2:4]
 
-            return raw.types.InputMediaDocument(
-                id=raw.types.InputDocument(
-                    id=file_id,
-                    access_hash=access_hash,
-                    file_reference=decode_file_ref(file_ref)
-                )
+            return raw.types.InputDocument(
+                id=file_id,
+                access_hash=access_hash,
+                file_reference=decode_file_ref(file_ref)
             )
 
         raise ValueError(f"Unknown media type: {file_id_str}")
+    
+    
 
 async def parse_messages(client, messages: "raw.types.messages.Messages", replies: int = 1) -> List["types.Message"]:
     users = {i.id: i for i in messages.users}
