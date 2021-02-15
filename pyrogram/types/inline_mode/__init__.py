@@ -27,5 +27,6 @@ from .inline_query_result_cached_document import InlineQueryResultCachedDocument
 
 __all__ = [
     "InlineQuery", "InlineQueryResult", "InlineQueryResultArticle", "InlineQueryResultPhoto",
-    "InlineQueryResultAnimation", "ChosenInlineResult"
+    "InlineQueryResultAnimation", "InlineQueryResultCachedPhoto", "InlineQueryResultCachedDocument",
+    "ChosenInlineResult",
 ]
