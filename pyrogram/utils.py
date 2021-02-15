@@ -31,6 +31,59 @@ from pyrogram import raw
 from pyrogram import types
 from pyrogram.file_id import FileId, FileType, PHOTO_TYPES, DOCUMENT_TYPES
 
+def decode_file_id(s: str) -> bytes:
+    s = base64.urlsafe_b64decode(s + "=" * (-len(s) % 4))
+    r = b""
+
+    major = s[-1]
+    minor = s[-2] if major != 2 else 0
+
+    assert minor in (0, 22, 24)
+
+    skip = 2 if minor else 1
+
+    i = 0
+
+    while i < len(s) - skip:
+        if s[i] != 0:
+            r += bytes([s[i]])
+        else:
+            r += b"\x00" * s[i + 1]
+            i += 1
+
+        i += 1
+
+    return r
+
+
+def encode_file_id(s: bytes) -> str:
+    r = b""
+    n = 0
+
+    for i in s + bytes([22]) + bytes([4]):
+        if i == 0:
+            n += 1
+        else:
+            if n:
+                r += b"\x00" + bytes([n])
+                n = 0
+
+            r += bytes([i])
+
+    return base64.urlsafe_b64encode(r).decode().rstrip("=")
+
+
+def encode_file_ref(file_ref: bytes) -> str:
+    return base64.urlsafe_b64encode(file_ref).decode().rstrip("=")
+
+
+def decode_file_ref(file_ref: str) -> bytes:
+    if file_ref is None:
+        return b""
+
+    return base64.urlsafe_b64decode(file_ref + "=" * (-len(file_ref) % 4))
+
+
 
 async def ainput(prompt: str = "", *, hide: bool = False):
     """Just like the built-in input, but async"""
@@ -77,17 +130,17 @@ def get_input_media_from_file_id(
 
     raise ValueError(f"Unknown file id: {file_id}")
 
-def get_input_file_from_file_id(
+def get_input_media_from_file_id(
     file_id_str: str,
     file_ref: str = None,
     expected_media_type: int = None
-) -> Union["raw.types.InputPhoto", "raw.types.InputDocument"]:
+) -> Union["raw.types.InputMediaPhoto", "raw.types.InputMediaDocument"]:
     try:
-        decoded = FileId.decode(file_id_str)
+        decoded = decode_file_id(file_id_str)
     except Exception:
         raise ValueError(f"Failed to decode file_id: {file_id_str}")
     else:
-        media_type = decoded.file_type
+        media_type = decoded[0]
 
         if expected_media_type is not None:
             if media_type != expected_media_type:
@@ -101,26 +154,29 @@ def get_input_file_from_file_id(
 
         if media_type == 2:
             unpacked = struct.unpack("<iiqqqiiii", decoded)
-            file_id, access_hash = unpacked[2:4]
+            dc_id, file_id, access_hash, volume_id, _, _, type, local_id = unpacked[1:]
 
-            return raw.types.InputPhoto(
-                id=file_id,
-                access_hash=access_hash,
-                file_reference=decode_file_ref(file_ref)
+            return raw.types.InputMediaPhoto(
+                id=raw.types.InputPhoto(
+                    id=file_id,
+                    access_hash=access_hash,
+                    file_reference=decode_file_ref(file_ref)
+                )
             )
 
         if media_type in (3, 4, 5, 8, 9, 10, 13):
             unpacked = struct.unpack("<iiqq", decoded)
-            file_id, access_hash = unpacked[2:4]
+            dc_id, file_id, access_hash = unpacked[1:]
 
-            return raw.types.InputDocument(
-                id=file_id,
-                access_hash=access_hash,
-                file_reference=decode_file_ref(file_ref)
+            return raw.types.InputMediaDocument(
+                id=raw.types.InputDocument(
+                    id=file_id,
+                    access_hash=access_hash,
+                    file_reference=decode_file_ref(file_ref)
+                )
             )
 
         raise ValueError(f"Unknown media type: {file_id_str}")
-    
 
 async def parse_messages(client, messages: "raw.types.messages.Messages", replies: int = 1) -> List["types.Message"]:
     users = {i.id: i for i in messages.users}
