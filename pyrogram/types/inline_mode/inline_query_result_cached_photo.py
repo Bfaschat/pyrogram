@@ -89,6 +89,9 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
         return raw.types.InputBotInlineResultPhoto(
             id=self.id,
             type=self.type,
+            title=self.title,
+            caption=self.caption
+            description=self.description,
             photo=photo,
             send_message=(
                 await self.input_message_content.write(self.reply_markup)
