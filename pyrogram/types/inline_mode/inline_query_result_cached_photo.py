@@ -59,15 +59,10 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
 
     def __init__(
         self,
-        title: str,
         file_id: str,
         file_ref: str = None,
         id: str = None,
-        description: str = None,
-        caption: str = None,
-        thumb_url: str = None,
-        thumb_width: int = None,
-        thumb_height: int = None,
+        caption: str = "",
         parse_mode: Union[str, None] = object,
         reply_markup: "types.InlineKeyboardMarkup" = None,
         input_message_content: "types.InputMessageContent" = None,
@@ -76,15 +71,10 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
 
         self.file_id = file_id
         self.file_ref = file_ref
-        self.title = title
-        self.description = description
         self.caption = caption
         self.parse_mode = parse_mode
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
-        self.thumb_url = thumb_url
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
 
     async def write(self):
         
@@ -93,9 +83,6 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
         return raw.types.InputBotInlineResultPhoto(
             id=self.id,
             type=self.type,
-            title=self.title,
-            caption=self.caption,
-            description=self.description,
             photo=photo,
             send_message=(
                 await self.input_message_content.write(self.reply_markup)
