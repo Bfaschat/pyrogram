@@ -90,7 +90,7 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
             id=self.id,
             type=self.type,
             title=self.title,
-            caption=self.caption
+            caption=self.caption,
             description=self.description,
             photo=photo,
             send_message=(
