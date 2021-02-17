@@ -63,6 +63,7 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
         file_id: str,
         file_ref: str = None,
         id: str = None,
+        description: str = None,
         caption: str = None,
         thumb_url: str = None,
         thumb_width: int = None,
