@@ -59,6 +59,7 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
 
     def __init__(
         self,
+        title: str,
         file_id: str,
         file_ref: str = None,
         id: str = None,
@@ -74,6 +75,8 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
 
         self.file_id = file_id
         self.file_ref = file_ref
+        self.title = title
+        self.description = description
         self.caption = caption
         self.parse_mode = parse_mode
         self.reply_markup = reply_markup
